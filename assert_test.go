@@ -1,9 +1,10 @@
 package assure_test
 
 import (
-	"assure"
 	"errors"
 	"testing"
+
+	"github.com/khlopko/assure"
 )
 
 func Recover(f func(), t *testing.T) {
