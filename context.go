@@ -52,43 +52,43 @@ func NewContext(isEnabled bool, failHandler FailHandler) Context {
 }
 
 func (ctx *Context) Assert(condition func() bool, msg string) {
-	if !condition() {
+	if ctx.isEnabled && !condition() {
 		ctx.failHandler(msg)
 	}
 }
 
 func (ctx *Context) Equal(a any, b any, msg string) {
-	if a != b {
+	if ctx.isEnabled && a != b {
 		ctx.failHandler(msg)
 	}
 }
 
 func (ctx *Context) NotEqual(a any, b any, msg string) {
-	if a == b {
+	if ctx.isEnabled && a == b {
 		ctx.failHandler(msg)
 	}
 }
 
 func (ctx *Context) Nil(a any, msg string) {
-	if a != nil {
+	if ctx.isEnabled && a != nil {
 		ctx.failHandler(msg)
 	}
 }
 
 func (ctx *Context) NotNil(a any, msg string) {
-	if a == nil {
+	if ctx.isEnabled && a == nil {
 		ctx.failHandler(msg)
 	}
 }
 
 func (ctx *Context) Err(err error, msg string) {
-	if err == nil {
+	if ctx.isEnabled && err == nil {
 		ctx.failHandler(msg)
 	}
 }
 
 func (ctx *Context) NoErr(err error, msg string) {
-	if err != nil {
+	if ctx.isEnabled && err != nil {
 		ctx.failHandler(msg)
 	}
 }
