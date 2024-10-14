@@ -1,25 +1,18 @@
-//go:build !release
-
 package assure
 
-import "fmt"
-
-type FailHandler func(msg string)
-
-// / Default fail handler that will panic with a message.
-func PanicHandler() FailHandler {
-	return func(msg string) {
-		panic(fmt.Sprintf("Assetion failed: %s", msg))
-	}
+// / Sets new fail handler as default to be used by assertions.
+// / Important: Not safe in a concurrent environment.
+func SetFailHandler(newHandler FailHandler) {
+	defaultContext = NewContext(defaultContext.isEnabled, newHandler)
 }
 
 // / Sets new fail handler as default to be used by assertions.
 // / Important: Not safe in a concurrent environment.
-func SetDefaultFailHandler(newHandler FailHandler) {
-	defaultContext = NewContext(newHandler)
+func SetIsEnabled(isEnabled bool) {
+	defaultContext = NewContext(isEnabled, defaultContext.failHandler)
 }
 
-var defaultContext = NewContext(PanicHandler())
+var defaultContext = NewContext(true, PanicHandler())
 
 func Assert(condition func() bool, msg string) {
 	defaultContext.Assert(condition, msg)
@@ -50,11 +43,12 @@ func NoErr(err error, msg string) {
 }
 
 type Context struct {
+	isEnabled   bool
 	failHandler FailHandler
 }
 
-func NewContext(failHandler FailHandler) Context {
-	return Context{failHandler}
+func NewContext(isEnabled bool, failHandler FailHandler) Context {
+	return Context{isEnabled, failHandler}
 }
 
 func (ctx *Context) Assert(condition func() bool, msg string) {
