@@ -42,6 +42,10 @@ func NoErr(err error, msg string) {
 	defaultContext.NoErr(err, msg)
 }
 
+func Never(msg string) {
+	defaultContext.Never(msg)
+}
+
 type Context struct {
 	isEnabled   bool
 	failHandler FailHandler
@@ -89,6 +93,12 @@ func (ctx *Context) Err(err error, msg string) {
 
 func (ctx *Context) NoErr(err error, msg string) {
 	if ctx.isEnabled && err != nil {
+		ctx.failHandler(msg)
+	}
+}
+
+func (ctx *Context) Never(msg string) {
+	if ctx.isEnabled {
 		ctx.failHandler(msg)
 	}
 }

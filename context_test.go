@@ -63,3 +63,36 @@ func TestNoErrPanics_WhenErr(t *testing.T) {
 		assure.NoErr(errors.New("my error"), "")
 	}, t)
 }
+
+func TestNeverPanics(t *testing.T) {
+	Recover(func() {
+		assure.Never("you got it all wrong")
+	}, t)
+}
+
+func TestDisabledDefaultContext(t *testing.T) {
+	assure.SetIsEnabled(false)
+	defer assure.SetIsEnabled(true)
+
+	assure.Assert(func() bool { return false }, "")
+	assure.Equal(1, 2, "")
+	assure.NotEqual(1, 1, "")
+	assure.Nil(1, "")
+	assure.NotNil(nil, "")
+	assure.Err(nil, "")
+	assure.NoErr(errors.New("my error"), "")
+	assure.Never("really never")
+}
+
+func TestCustomDefaultFailHandler(t *testing.T) {
+	handled := false
+	assure.SetFailHandler(func(msg string) {
+		handled = true
+	})
+
+	assure.Assert(func() bool { return false }, "")
+
+	if !handled {
+		t.Error("Expect to change `handled` variable to `true` in a custom handler")
+	}
+}
